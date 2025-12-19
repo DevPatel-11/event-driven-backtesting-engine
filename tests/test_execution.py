@@ -29,6 +29,7 @@ def test_create_fill_buy_order():
     events = Queue()
     data = CSVDataHandler(events, "examples/data", ["AAPL"])
     handler = ExecutionHandler(events, data)
+    data.update_bars()  # Load first bar
     
     order = OrderEvent(
         timestamp=datetime(2023, 1, 1),
