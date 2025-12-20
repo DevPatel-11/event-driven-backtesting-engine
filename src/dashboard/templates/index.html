@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtesting Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar { height: 100vh; background-color: #343a40; color: white; position: fixed; }
+        .sidebar a { color: #adb5bd; padding: 15px 20px; display: block; text-decoration: none; }
+        .sidebar a:hover, .sidebar a.active { background-color: #495057; color: white; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .metric-card { border-left: 4px solid; transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-5px); }
+        .positive { border-color: #28a745; }
+        .negative { border-color: #dc3545; }
+        .neutral { border-color: #17a2b8; }
+        @media (max-width: 768px) { .main-content { margin-left: 0; } .sidebar { display: none; } }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" style="width: 250px;">
+        <div class="p-3">
+            <h4><i class="fas fa-chart-line"></i> Backtest Dashboard</h4>
+            <hr>
+        </div>
+        <a href="#" class="active" onclick="showSection('overview')"><i class="fas fa-home"></i> Overview</a>
+        <a href="#" onclick="showSection('backtests')"><i class="fas fa-list"></i> Backtest Runs</a>
+        <a href="#" onclick="showSection('performance')"><i class="fas fa-chart-area"></i> Performance</a>
+        <a href="#" onclick="showSection('analytics')"><i class="fas fa-analytics"></i> Analytics</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Event-Driven Backtesting Engine</h2>
+            <div>
+                <button class="btn btn-primary" onclick="loadBacktests()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview-section">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card metric-card positive">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Backtests</h6>
+                            <h2 id="total-backtests">0</h2>
+                            <small class="text-success"><i class="fas fa-arrow-up"></i> Active</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card positive">
+                        <div class="card-body">
+                            <h6 class="text-muted">Avg Return</h6>
+                            <h2 id="avg-return">0%</h2>
+                            <small class="text-muted">Across all runs</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card neutral">
+                        <div class="card-body">
+                            <h6 class="text-muted">Avg Sharpe Ratio</h6>
+                            <h2 id="avg-sharpe">0.0</h2>
+                            <small class="text-muted">Risk-adjusted</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card negative">
+                        <div class="card-body">
+                            <h6 class="text-muted">Avg Drawdown</h6>
+                            <h2 id="avg-drawdown">0%</h2>
+                            <small class="text-danger"><i class="fas fa-arrow-down"></i> Maximum</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equity Curve Chart -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Equity Curve</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="equityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backtest Runs Section -->
+        <div id="backtests-section" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Backtest Runs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Strategy</th>
+                                    <th>Symbol</th>
+                                    <th>Return</th>
+                                    <th>Sharpe</th>
+                                    <th>Max DD</th>
+                                    <th>Trades</th>
+                                    <th>Win Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backtests-table">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let backtests = [];
+
+        // Load backtests from API
+        async function loadBacktests() {
+            try {
+                const response = await fetch('/api/backtests');
+                backtests = await response.json();
+                updateOverview();
+                populateTable();
+                loadPerformanceChart();
+            } catch (error) {
+                console.error('Error loading backtests:', error);
+            }
+        }
+
+        // Update overview metrics
+        function updateOverview() {
+            document.getElementById('total-backtests').textContent = backtests.length;
+            
+            const avgReturn = backtests.reduce((sum, b) => sum + b.total_return, 0) / backtests.length;
+            document.getElementById('avg-return').textContent = avgReturn.toFixed(2) + '%';
+            
+            const avgSharpe = backtests.reduce((sum, b) => sum + b.sharpe_ratio, 0) / backtests.length;
+            document.getElementById('avg-sharpe').textContent = avgSharpe.toFixed(2);
+            
+            const avgDD = backtests.reduce((sum, b) => sum + b.max_drawdown, 0) / backtests.length;
+            document.getElementById('avg-drawdown').textContent = avgDD.toFixed(2) + '%';
+        }
+
+        // Populate backtest table
+        function populateTable() {
+            const tbody = document.getElementById('backtests-table');
+            tbody.innerHTML = backtests.map(b => `
+                <tr>
+                    <td>${b.id}</td>
+                    <td>${b.name}</td>
+                    <td><span class="badge bg-primary">${b.strategy}</span></td>
+                    <td><strong>${b.symbol}</strong></td>
+                    <td><span class="text-success">${b.total_return.toFixed(2)}%</span></td>
+                    <td>${b.sharpe_ratio.toFixed(2)}</td>
+                    <td><span class="text-danger">${b.max_drawdown.toFixed(2)}%</span></td>
+                    <td>${b.trades}</td>
+                    <td>${b.win_rate.toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+
+        // Load and display performance chart
+        async function loadPerformanceChart() {
+            const response = await fetch('/api/performance/1');
+            const data = await response.json();
+            
+            const ctx = document.getElementById('equityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: data.map(d => d.value),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: false, ticks: { callback: value => '$' + value.toLocaleString() } }
+                    }
+                }
+            });
+        }
+
+        // Show/hide sections
+        function showSection(section) {
+            document.getElementById('overview-section').style.display = 'none';
+            document.getElementById('backtests-section').style.display = 'none';
+            
+            if (section === 'overview') document.getElementById('overview-section').style.display = 'block';
+            if (section === 'backtests') document.getElementById('backtests-section').style.display = 'block';
+        }
+
+        // Initialize on page load
+        window.onload = loadBacktests;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
