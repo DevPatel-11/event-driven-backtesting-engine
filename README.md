@@ -520,3 +520,69 @@ Resource Usage:
 ```
 
 See [`performance_profiling/README.md`](performance_profiling/README.md) for complete documentation.
+
+## Modular Execution Architecture
+
+Clean separation of concerns with dependency injection for production-grade code organization.
+
+### Architecture
+
+```
+Trading Engine
+    ├── Strategy Interface      (Signal generation)
+    ├── Risk Manager         (Position limits, exposure checks)
+    ├── Execution Simulator  (Latency models, slippage)
+    └── Market Data Handler  (Data abstraction)
+```
+
+### Key Features
+
+- **Interface-based Design**: All components implement clean interfaces
+- **Dependency Injection**: Easy to swap implementations (backtest → live)
+- **SOLID Principles**: Single responsibility, open/closed, dependency inversion
+- **Testability**: Mock any component for isolated unit tests
+
+### Quick Start
+
+```python
+# 1. Create components
+strategy = SimpleMovingAverageStrategy(fast=10, slow=20)
+risk_mgr = PositionRiskManager(max_position=1000)
+exec_sim = RealisticExecutionSimulator(latency_model=LatencyModel.NORMAL)
+
+# 2. Compose engine
+engine = TradingEngine(strategy, risk_mgr, exec_sim)
+
+# 3. Process events
+for market_data in feed:
+    engine.process_market_data(market_data)
+```
+
+### Components
+
+**Strategy (`IStrategy`)**
+- Convert market data → signals
+- BUY, SELL, CLOSE signals
+- Confidence scores
+
+**Risk Manager (`IRiskManager`)**
+- Position size limits
+- Portfolio exposure limits
+- Concentration checks
+- Returns: APPROVED / REJECTED / WARNING
+
+**Execution Simulator (`IExecutionSimulator`)**
+- Latency models: ZERO, CONSTANT, NORMAL, REALISTIC_HFT
+- Slippage simulation (basis points)
+- Commission calculation
+
+### Benefits
+
+✅ **Modular**: Change one component without affecting others  
+✅ **Testable**: Unit test each module in isolation  
+✅ **Extensible**: Add new strategies/risk rules easily  
+✅ **Production-ready**: Same interfaces work in live trading  
+
+See [`docs/MODULAR_ARCHITECTURE.md`](docs/MODULAR_ARCHITECTURE.md) for complete documentation.
+
+**Demo**: `python examples/modular_execution/demo_separation.py`
