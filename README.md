@@ -635,3 +635,81 @@ streamlit run src/dashboard/app.py
 See [`src/dashboard/README.md`](src/dashboard/README.md) for detailed documentation.
 
 **Screenshot**: Launch the dashboard to see live interactive visualizations!
+
+---
+
+## 📚 Strategy Library
+
+Production-ready algorithmic trading strategies for immediate use.
+
+### Available Strategies
+
+#### 1. **VWAP (Volume-Weighted Average Price)**
+- **Use Case**: Large institutional order execution
+- **Description**: Slices orders according to volume profile to minimize market impact
+- **Best For**: Executing large orders over time
+
+```python
+from src.strategies import VWAPStrategy
+
+strategy = VWAPStrategy(
+    target_quantity=10000,
+    total_duration_minutes=120
+)
+```
+
+#### 2. **TWAP (Time-Weighted Average Price)**
+- **Use Case**: Simple execution with minimal market impact
+- **Description**: Splits orders into equal time slices
+- **Best For**: Predictable execution without volume data
+
+```python
+from src.strategies import TWAPStrategy
+
+strategy = TWAPStrategy(
+    target_quantity=5000,
+    total_duration_minutes=60,
+    num_slices=10
+)
+```
+
+#### 3. **Mean Reversion**
+- **Use Case**: Trading price reversions using Bollinger Bands
+- **Description**: Enters positions when price deviates from moving average
+- **Best For**: Range-bound markets
+
+```python
+from src.strategies import MeanReversionStrategy
+
+strategy = MeanReversionStrategy(
+    window=20,
+    num_std=2.0,
+    position_size=100
+)
+```
+
+#### 4. **Statistical Arbitrage (Pairs Trading)**
+- **Use Case**: Trading cointegrated pairs for market-neutral returns
+- **Description**: Monitors spread between correlated assets
+- **Best For**: Market-neutral strategies
+
+```python
+from src.strategies import StatisticalArbitrageStrategy
+
+strategy = StatisticalArbitrageStrategy(
+    symbol_pair=('MSFT', 'GOOGL'),
+    window=30,
+    entry_threshold=2.0,
+    exit_threshold=0.5
+)
+```
+
+### Strategy Benefits
+
+✅ **Production-Ready**: Clean interfaces, error handling, state management
+✅ **Reusable**: Easy to mix strategies or create portfolio allocations
+✅ **Documented**: Each strategy includes comprehensive docstrings
+✅ **Extensible**: Simple to add new strategies following the same pattern
+
+See [Strategy Library Documentation](src/strategies/README.md) for detailed usage and examples.
+
