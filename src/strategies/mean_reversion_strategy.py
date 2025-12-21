@@ -8,7 +8,7 @@ Buys when price drops below mean, sells when above.
 from typing import Dict, Optional, List
 from collections import deque
 import numpy as np
-from interfaces.strategy_interface import StrategyInterface
+from src.interfaces.strategy_interface import StrategyInterface
 
 
 class MeanReversionStrategy(StrategyInterface):

@@ -7,7 +7,7 @@ Simpler alternative to VWAP.
 
 from typing import Dict, Optional
 from datetime import datetime, timedelta
-from interfaces.strategy_interface import StrategyInterface
+from src.interfaces.strategy_interface import StrategyInterface
 
 
 class TWAPStrategy(StrategyInterface):

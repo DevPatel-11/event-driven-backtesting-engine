@@ -7,7 +7,7 @@ Used for large institutional orders.
 
 from typing import Dict, Optional
 import numpy as np
-from interfaces.strategy_interface import StrategyInterface
+from src.interfaces.strategy_interface import StrategyInterface
 
 
 class VWAPStrategy(StrategyInterface):
