@@ -1,0 +1,37 @@
+{
+  "benchmark_name": "scalability_100000",
+  "total_time_seconds": 0.10789299011230469,
+  "resource_usage": {
+    "cpu_percent": {
+      "mean": 0.0,
+      "max": 0.0,
+      "min": 0.0
+    },
+    "memory_mb": {
+      "mean": 17.375,
+      "max": 17.375,
+      "min": 17.375,
+      "peak": 17.375
+    },
+    "num_samples": 1
+  },
+  "tick_performance": {
+    "tick_stats": {
+      "mean_us": 0.889877251102007,
+      "median_us": 0.7519993232563138,
+      "min_us": 0.7210001058410853,
+      "max_us": 167.1919999353122,
+      "stddev_us": 0.7931709565429609,
+      "total_ticks": 100000,
+      "ticks_per_second": 1123750.4934097587
+    },
+    "component_stats": {}
+  },
+  "tick_percentiles": {
+    "p50_us": 0.7519993232563138,
+    "p90_us": 1.4719998944201507,
+    "p95_us": 1.5530004020547494,
+    "p99_us": 1.8239998098579235
+  },
+  "timestamp": "2025-12-22 02:49:40"
+}
