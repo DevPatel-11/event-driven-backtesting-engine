@@ -586,3 +586,52 @@ for market_data in feed:
 See [`docs/MODULAR_ARCHITECTURE.md`](docs/MODULAR_ARCHITECTURE.md) for complete documentation.
 
 **Demo**: `python examples/modular_execution/demo_separation.py`
+
+## 📈 Interactive Dashboard
+
+Professional visualization dashboard built with Streamlit and Plotly for presenting backtest results.
+
+### Features
+
+📊 **Performance Metrics**
+- Total Return, Sharpe Ratio, Max Drawdown
+- Win Rate, Volatility tracking
+- Real-time metric cards
+
+💵 **Equity Curve & Drawdown**
+- Interactive time-series plots
+- Drawdown visualization
+- Hover tooltips for detailed analysis
+
+⚡ **Execution Analytics**
+- Slippage distribution (basis points)
+- Latency distribution (milliseconds)
+- P99 latency tracking for HFT analysis
+
+📋 **Market Microstructure**
+- Volume imbalance visualization
+- Bid/Ask ratio over time
+- Color-coded market conditions
+
+### Quick Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run dashboard
+streamlit run src/dashboard/app.py
+
+# Access at http://localhost:8501
+```
+
+### Why This Matters
+
+✅ **Visual Impact**: Makes your technical work immediately understandable  
+✅ **Interview Ready**: Demo-able in interviews and presentations  
+✅ **Full-Stack Skills**: Shows frontend + backend capability  
+✅ **Production UI**: Professional dashboard recruiters recognize  
+
+See [`src/dashboard/README.md`](src/dashboard/README.md) for detailed documentation.
+
+**Screenshot**: Launch the dashboard to see live interactive visualizations!
